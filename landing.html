@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio — Brand Portfolio</title>
+<style>
+  :root {
+    --fg:      oklch(96% 0.002 95);
+    --fg-dim:  oklch(72% 0.008 70);
+    --muted:   oklch(55% 0.012 70);
+    --border:  oklch(100% 0 0 / 0.12);
+    --accent:  oklch(68% 0.14 32);
+    --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+    --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono:    'SF Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    background: #0d0d0d;
+    color: var(--fg);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body { overflow-x: hidden; }
+
+  /* ── Navigation ─────────────────────────── */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    mix-blend-mode: difference;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--fg-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    transition: color 0.25s;
+  }
+
+  .nav-links a:hover { color: var(--fg); }
+
+  /* ── Hero — full viewport ────────────────── */
+  .hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  /* Layer 1 — bottom photo (always visible, shows through the top) */
+  .hero-bottom-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bottom-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Layer 2 — top photo (masked: cursor position opens a window to the bottom) */
+  .hero-top-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: url('mpf35ovt-8ccea8d1137f16691f4e4fb4b322f996.png') center/cover no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+  }
+
+  /* Grid pattern overlay — mouse-driven offset */
+  .hero-grid-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.1;
+  }
+
+  .hero-grid-overlay svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .hero-reveal-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* ── Hero text — corners only ───────────── */
+  .hero-content {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-top-left {
+    position: absolute;
+    top: clamp(5rem, 10vh, 7rem);
+    left: 4rem;
+    max-width: 26ch;
+  }
+
+  .hero-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .hero-bottom-right {
+    position: absolute;
+    bottom: 3rem;
+    right: 4rem;
+    max-width: 30ch;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.75rem;
+  }
+
+  .hero-meta {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    line-height: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .hero-meta strong {
+    display: block;
+    color: var(--fg);
+    font-weight: 500;
+    text-transform: none;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-deck {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--fg-dim);
+    max-width: 28ch;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .hero-cta {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--fg-dim);
+    padding-bottom: 0.2rem;
+    transition: border-color 0.25s;
+    pointer-events: auto;
+    user-select: auto;
+  }
+
+  .hero-cta:hover { border-color: var(--fg); }
+
+  /* ── Shared section styles ──────────────── */
+  section.page-section {
+    padding: 5rem 4rem;
+    background: #0d0d0d;
+  }
+
+  .section-border { border-top: 1px solid var(--border); }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Works ───────────────────────────────── */
+  .works-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .work-card { cursor: pointer; }
+
+  .work-card-thumb {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: oklch(20% 0.01 250);
+    transition: opacity 0.3s;
+  }
+
+  .work-card:hover .work-card-thumb { opacity: 0.5; }
+
+  .work-card-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    margin-top: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .work-card-meta {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ── Philosophy + Contact ───────────────── */
+  .dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+
+  .dual-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .dual-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--fg-dim);
+  }
+
+  .dual-text p + p { margin-top: 1.5rem; }
+
+  .contact-details {
+    font-size: 1rem;
+    line-height: 2.2;
+  }
+
+  .contact-details a {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .contact-details a:hover { border-color: var(--fg); }
+
+  .contact-note {
+    display: block;
+    margin-top: 2rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
+  /* ── Footer ──────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    background: #0d0d0d;
+  }
+
+  /* ── Responsive ──────────────────────────── */
+
+  @media (max-width: 1024px) {
+    nav, .page-section, footer {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+    .hero-top-left { left: 2rem; }
+    .hero-bottom-right { right: 2rem; bottom: 2rem; }
+  }
+
+  @media (max-width: 744px) {
+    nav, .page-section, footer {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .nav-links { gap: 1.25rem; }
+    .nav-links a { font-size: 0.65rem; }
+
+    .hero-top-left { left: 1.5rem; top: clamp(4rem, 8vh, 5rem); }
+    .hero-bottom-right { right: 1.5rem; bottom: 2rem; max-width: 24ch; }
+
+    .hero-headline {
+      font-size: clamp(1.75rem, 7vw, 3rem);
+    }
+
+    .works-grid { grid-template-columns: 1fr; }
+    .dual { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  @media (max-width: 430px) {
+    nav, .page-section, footer {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    nav { flex-wrap: wrap; gap: 0.5rem; }
+
+    .hero-top-left { left: 1rem; top: 4.5rem; max-width: 18ch; }
+    .hero-bottom-right { right: 1rem; bottom: 1.5rem; max-width: 20ch; gap: 1rem; }
+
+    .hero-headline { font-size: 1.5rem; }
+    .hero-deck { font-size: 0.8125rem; }
+
+    .dual-headline, .works-title { font-size: 1.625rem; }
+
+    footer {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────── -->
+<nav>
+  <a href="/" class="nav-logo">Studio</a>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#studio">Studio</a></li>
+    <li><a href="#journal">Journal</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ═══ Hero — full viewport ═══════════════════════ -->
+<section class="hero" id="hero">
+
+  <!-- Layer 1 — bottom photo (shows through the top) -->
+  <div class="hero-bottom-layer">
+    <img src="mpf35qc8-012377ff789689a1cfc0d122e0caa189.png" alt="">
+  </div>
+
+  <!-- Layer 2 — top photo (mask opens a window to the bottom) -->
+  <div class="hero-top-layer" id="heroTopLayer"></div>
+
+  <!-- Grid pattern -->
+  <div class="hero-grid-overlay" id="heroGridOverlay">
+    <svg id="heroGridSvg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+          <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#64748b" stroke-width="0.6" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
+    </svg>
+  </div>
+
+  <canvas class="hero-reveal-canvas" id="heroRevealCanvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-top-left">
+      <div class="hero-kicker">Selected Work / 2026</div>
+      <h1 class="hero-headline">Craft that speaks<br>before the brief does</h1>
+    </div>
+
+    <div class="hero-bottom-right">
+      <div class="hero-meta">
+        Client<strong>Maison</strong>
+        Discipline<strong>Brand Identity</strong>
+        Year<strong>2026</strong>
+      </div>
+
+      <p class="hero-deck">
+        A considered approach to visual identity — where every weight,
+        curve, and interval carries intention.
+      </p>
+
+      <a href="#work" class="hero-cta">View the case study</a>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══ Selected Works ═══════════════════════════ -->
+<section class="page-section section-border" id="work">
+  <div class="section-label">Portfolio</div>
+  <h2 class="works-title">Recent work</h2>
+
+  <div class="works-grid">
+    <div class="work-card">
+      <div class="work-card-thumb"></div>
+      <div class="work-card-title">Atelier Nº5</div>
+      <div class="work-card-meta">Brand Identity / 2025</div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-thumb"></div>
+      <div class="work-card-title">Meridian Capital</div>
+      <div class="work-card-meta">Digital Experience / 2025</div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-thumb"></div>
+      <div class="work-card-title">Sora Publications</div>
+      <div class="work-card-meta">Editorial Design / 2024</div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-thumb"></div>
+      <div class="work-card-title">Vantage Point</div>
+      <div class="work-card-meta">Art Direction / 2024</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ Studio Philosophy ════════════════════════ -->
+<section class="page-section dual section-border" id="studio">
+  <div>
+    <div class="section-label">Studio</div>
+    <h2 class="dual-headline">We don't decorate.<br>We define.</h2>
+  </div>
+  <div class="dual-text">
+    <p>
+      Every brand carries an internal logic — a set of tensions, ambitions,
+      and constraints that make it unlike any other. Our job is to surface
+      that logic and give it form. Not decoration applied after the fact,
+      but structure discovered from within.
+    </p>
+    <p>
+      We work across identity, digital, and editorial with a small,
+      senior team. No pitch theatre. No account handlers. Just direct
+      collaboration between the people who think about the problem and
+      the people who make the work.
+    </p>
+  </div>
+</section>
+
+
+<!-- ═══ Contact ═════════════════════════════════ -->
+<section class="page-section dual section-border" id="contact">
+  <div>
+    <div class="section-label">Contact</div>
+    <h2 class="dual-headline">Start a<br>conversation</h2>
+  </div>
+  <div class="contact-details">
+    <p>
+      <a href="mailto:hello@studio.co">hello@studio.co</a><br>
+      <a href="tel:+12125551234">+1 212 555 1234</a>
+    </p>
+    <p style="margin-top:1.5rem;">
+      47 Walker Street<br>
+      New York, NY 10013
+    </p>
+    <span class="contact-note">We take on four new engagements each year. Currently booking for Q3 2026.</span>
+  </div>
+</section>
+
+</main>
+
+<!-- ── Footer ──────────────────────────────── -->
+<footer>
+  <span>© 2026 Studio</span>
+  <span>New York &nbsp;·&nbsp; London</span>
+</footer>
+
+<!-- ═══ Dual-image reveal engine ═══════════════ -->
+<script>
+(function() {
+
+  const hero        = document.getElementById('hero');
+  const gridPattern = document.getElementById('grid');
+  const topLayer    = document.getElementById('heroTopLayer');
+  const canvas = document.getElementById('heroRevealCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let canvasW, canvasH;
+
+  /* ── Sizing ──────────────────────────── */
+  function sizeCanvas() {
+    canvasW = canvas.width  = window.innerWidth;
+    canvasH = canvas.height = window.innerHeight;
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  /* ── Smooth cursor ──────────────────── */
+  const raw   = { x: canvasW * 0.5, y: canvasH * 0.5 };
+  const smooth = { x: canvasW * 0.5, y: canvasH * 0.5 };
+
+  const SMOOTH_FACTOR   = 0.1;   // cursor follow speed
+  const GRID_LAG_FACTOR = 0.06;  // grid parallax lag
+  const REVEAL_RADIUS   = 260;
+
+  let gridOffsetX = 0;
+  let gridOffsetY = 0;
+
+  function onMove(e) {
+    raw.x = e.clientX;
+    raw.y = e.clientY;
+  }
+
+  window.addEventListener('mousemove', onMove, { passive: true });
+  window.addEventListener('touchmove', function(e) {
+    if (e.touches.length) {
+      raw.x = e.touches[0].clientX;
+      raw.y = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  /* ── Render loop ────────────────────── */
+  function tick() {
+    requestAnimationFrame(tick);
+
+    /* smooth cursor */
+    smooth.x += (raw.x - smooth.x) * SMOOTH_FACTOR;
+    smooth.y += (raw.y - smooth.y) * SMOOTH_FACTOR;
+
+    /* center-normalized coordinates relative to hero rect */
+    var rect = hero.getBoundingClientRect();
+    var cx = (smooth.x - rect.left) / rect.width - 0.5;
+    var cy = (smooth.y - rect.top) / rect.height - 0.5;
+
+    /* ── grid offset (parallax) ────── */
+    var gtx = cx * 16;
+    var gty = cy * 16;
+    gridOffsetX += (gtx - gridOffsetX) * GRID_LAG_FACTOR;
+    gridOffsetY += (gty - gridOffsetY) * GRID_LAG_FACTOR;
+    gridPattern.setAttribute('x', gridOffsetX);
+    gridPattern.setAttribute('y', gridOffsetY);
+
+    /* ── spotlight mask ── */
+    var rx = smooth.x;
+    var ry = smooth.y;
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    var grad = ctx.createRadialGradient(rx, ry, 0, rx, ry, REVEAL_RADIUS);
+    grad.addColorStop(0,    'rgba(255,255,255,1)');
+    grad.addColorStop(0.4,  'rgba(255,255,255,1)');
+    grad.addColorStop(0.6,  'rgba(255,255,255,0.75)');
+    grad.addColorStop(0.75, 'rgba(255,255,255,0.4)');
+    grad.addColorStop(0.88, 'rgba(255,255,255,0.12)');
+    grad.addColorStop(1,    'rgba(255,255,255,0)');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(rx, ry, REVEAL_RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+
+    var dataUrl = canvas.toDataURL();
+    topLayer.style.maskImage       = 'url(' + dataUrl + ')';
+    topLayer.style.webkitMaskImage = 'url(' + dataUrl + ')';
+  }
+
+  requestAnimationFrame(tick);
+
+})();
+</script>
+
+</body>
+</html>
